@@ -128,8 +128,8 @@ def create_rss_feed(csv_file, output_file='feed.xml', site_url='https://example.
             if original_content or bajada:
                 full_content = ""
                 if bajada:
-                    # Add bajada as a styled subtitle at the beginning
-                    full_content = f'<p style="font-size: 1.2em; font-style: italic; color: #666; margin-bottom: 1.5em;">{bajada}</p>'
+                    # Add bajada as a subtitle at the beginning
+                    full_content = f'<h2>{bajada}</h2>'
                 if original_content:
                     full_content += clean_html(original_content)
                 xml_lines.append(f'      <content:encoded><![CDATA[{full_content}]]></content:encoded>')
