@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATLAS DE TODO - RSS Feed</title>
+    <link rel="alternate" type="application/rss+xml" title="ATLAS DE TODO" href="./feed.xml" />
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #e0e0e0;
+        }
+        h1 {
+            color: #fff;
+            font-size: 2.5em;
+            margin-bottom: 0.2em;
+        }
+        .tagline {
+            color: #888;
+            font-style: italic;
+            margin-bottom: 2em;
+        }
+        .feed-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            margin: 10px 10px 10px 0;
+        }
+        .feed-button:hover {
+            transform: translateY(-2px);
+        }
+        .feed-button svg {
+            margin-right: 8px;
+        }
+        .instructions {
+            margin-top: 3em;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        .instructions h2 {
+            color: #fff;
+            font-size: 1.2em;
+        }
+        .instructions ol {
+            line-height: 1.8;
+        }
+        .instructions code {
+            background: #2a2a2a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #667eea;
+        }
+        .url-copy {
+            display: flex;
+            margin: 20px 0;
+            background: #1a1a1a;
+            border-radius: 6px;
+            padding: 12px;
+            align-items: center;
+        }
+        .url-copy input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #e0e0e0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .url-copy button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>ATLAS DE TODO</h1>
+    <p class="tagline">Hackea el antropoceno; contempla el fin de los tiempos.</p>
+    
+    <a href="feed.xml" class="feed-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 11a9 9 0 0 1 9 9"></path>
+            <path d="M4 4a16 16 0 0 1 16 16"></path>
+            <circle cx="5" cy="19" r="1"></circle>
+        </svg>
+        RSS Feed
+    </a>
+    
+    <a href="https://feedly.com/i/subscription/feed%2F" onclick="this.href='https://feedly.com/i/subscription/feed%2F' + encodeURIComponent(window.location.origin + '/feed.xml')" class="feed-button" style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);">
+        Abrir en Feedly
+    </a>
+    
+    <div class="url-copy">
+        <input type="text" id="feed-url" value="" readonly>
+        <button onclick="copyFeedUrl()">Copiar</button>
+    </div>
+    
+    <div class="instructions">
+        <h2>¿Cómo suscribirse?</h2>
+        <ol>
+            <li>Copia la URL del feed usando el botón de arriba</li>
+            <li>Abre tu lector RSS favorito (Feedly, Inoreader, NewsBlur, etc.)</li>
+            <li>Busca la opción "Agregar feed" o "Add subscription"</li>
+            <li>Pega la URL y confirma</li>
+        </ol>
+        
+        <h2>Lectores RSS recomendados</h2>
+        <ul>
+            <li><a href="https://feedly.com" style="color: #667eea;">Feedly</a> - Popular y fácil de usar</li>
+            <li><a href="https://www.inoreader.com" style="color: #667eea;">Inoreader</a> - Potente y gratuito</li>
+            <li><a href="https://newsblur.com" style="color: #667eea;">NewsBlur</a> - Open source</li>
+            <li><a href="https://theoldreader.com" style="color: #667eea;">The Old Reader</a> - Estilo clásico</li>
+        </ul>
+    </div>
+    
+    <script>
+        // Actualizar URL del feed
+        document.getElementById('feed-url').value = window.location.origin + '/feed.xml';
+        
+        function copyFeedUrl() {
+            const input = document.getElementById('feed-url');
+            input.select();
+            document.execCommand('copy');
+            event.target.textContent = '¡Copiado!';
+            setTimeout(() => {
+                event.target.textContent = 'Copiar';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

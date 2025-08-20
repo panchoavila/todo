@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# CSV source (si no quieres exponerlo)
+# Todo.csv
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Configuración local
+feed_config.py
