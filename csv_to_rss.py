@@ -122,9 +122,17 @@ def create_rss_feed(csv_file, output_file='feed.xml', site_url='https://example.
             
             # Full content in content:encoded with CDATA
             original_content = row.get('Original', '')
-            if original_content:
-                cleaned_content = clean_html(original_content)
-                xml_lines.append(f'      <content:encoded><![CDATA[{cleaned_content}]]></content:encoded>')
+            bajada = row.get('Bajada', '')
+            
+            # Combine bajada as subtitle with original content
+            if original_content or bajada:
+                full_content = ""
+                if bajada:
+                    # Add bajada as a styled subtitle at the beginning
+                    full_content = f'<p style="font-size: 1.2em; font-style: italic; color: #666; margin-bottom: 1.5em;">{bajada}</p>'
+                if original_content:
+                    full_content += clean_html(original_content)
+                xml_lines.append(f'      <content:encoded><![CDATA[{full_content}]]></content:encoded>')
             
             # Categories
             capitulo = row.get('Capítulo', '')
