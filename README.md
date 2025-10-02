@@ -63,6 +63,14 @@ Ejemplos rápidos:
 - Actualización menor: `Slug=energia-solar`, `Fecha=2025-09-30T18:42:00Z` (mismo Slug; el ítem se reordena como más reciente).
 - Re-publicación como nueva entrada: `Slug=energia-solar-v2`, `Fecha=2025-10-01T09:15:00Z` (nuevo Slug; se verá como ítem nuevo en todos los lectores).
 
+## 🗂️ Convención de archivos CSV
+
+- Archivo preferido: `Todo.csv`. Si existe, el script lo usa directamente.
+- Versionados por fecha: puedes mantener copias como `Todo 01-10-25.csv`, `Todo 20-08-25.csv`, etc. El script detecta automáticamente el CSV más reciente coincidente con `Todo*.csv` (por fecha de modificación) cuando falta `Todo.csv`.
+- Git ignore: estos archivos versionados quedan fuera del repo (`.gitignore` incluye `Todo *.csv`). Solo se publica `feed.xml`.
+- Forzar un CSV concreto: renombra temporalmente el archivo elegido a `Todo.csv` antes de ejecutar `python3 csv_to_rss.py`.
+- Sugerencia: además de versionar por nombre, actualiza la columna `Fecha` (o `Actualizado`) dentro del CSV para reflejar la última edición; el feed se ordena con ese valor.
+
 ## ⚙️ Configuración
 
 Edita `feed_config.py` para personalizar:
