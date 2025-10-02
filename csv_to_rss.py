@@ -5,6 +5,7 @@ from datetime import datetime
 import html
 import re
 import os
+import glob
 
 def clean_html(html_string):
     """Clean HTML content for RSS feed"""
@@ -37,6 +38,35 @@ def truncate_text(text, max_length=500):
         return text
     return text[:max_length] + "..."
 
+def get_first_value(row, keys, default=""):
+    """Return the first non-empty value from the given keys in row."""
+    for k in keys:
+        v = row.get(k)
+        if v is not None and str(v).strip() != "":
+            return v
+    return default
+
+def _resolve_csv_file(csv_file_pattern):
+    """Resolve the CSV file to use. If the exact csv_file_pattern exists, use it.
+    Otherwise, try the latest matching 'Todo*.csv' by modification time.
+    """
+    # Exact file present
+    if csv_file_pattern and os.path.exists(csv_file_pattern):
+        return csv_file_pattern
+
+    # Fallback: pick most recent matching pattern
+    candidates = sorted(
+        glob.glob('Todo*.csv'),
+        key=lambda p: os.path.getmtime(p),
+        reverse=True
+    )
+    if candidates:
+        print(f"[info] 'Todo.csv' no encontrado. Usando CSV más reciente: {candidates[0]}")
+        return candidates[0]
+
+    raise FileNotFoundError(f"No se encontró '{csv_file_pattern}' ni archivos 'Todo*.csv' en el directorio actual.")
+
+
 def create_rss_feed(csv_file, output_file='feed.xml', site_url='https://example.com', 
                    feed_title='Mi Feed RSS', feed_description='Feed RSS generado desde CSV'):
     """Convert CSV to RSS XML feed - Simple version"""
@@ -64,36 +94,40 @@ def create_rss_feed(csv_file, output_file='feed.xml', site_url='https://example.
     
     # Read CSV and create items
     items_added = 0
-    with open(csv_file, 'r', encoding='utf-8', errors='ignore') as f:
+    csv_path = _resolve_csv_file(csv_file)
+    with open(csv_path, 'r', encoding='utf-8', errors='ignore') as f:
         reader = csv.DictReader(f)
-        
+
         # Sort by date if available
         rows = list(reader)
         rows_with_dates = []
-        
+
         for row in rows:
             # Skip drafts
-            if row.get(':draft', '').lower() == 'true':
+            estado = str(row.get('Estado', '')).strip().lower()
+            if row.get(':draft', '').lower() == 'true' or estado in {'draft', 'borrador', 'true', '1'}:
                 continue
-                
-            # Parse date
-            date_str = row.get('Fecha', '')
+
+            # Parse date: prefer 'Fecha', fallback to 'Actualizado'
+            date_str = get_first_value(row, ['Fecha', 'Actualizado'], '')
             if date_str:
                 try:
-                    pub_date = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-                    rows_with_dates.append((pub_date, row))
-                except:
-                    rows_with_dates.append((datetime.now(), row))
-        
+                    pub_date = datetime.fromisoformat(str(date_str).replace('Z', '+00:00'))
+                except Exception:
+                    pub_date = datetime.now()
+            else:
+                pub_date = datetime.now()
+            rows_with_dates.append((pub_date, row))
+
         # Sort by date, newest first
         rows_with_dates.sort(key=lambda x: x[0], reverse=True)
-        
+
         # Create RSS items
         for pub_date, row in rows_with_dates[:50]:  # Limit to 50 most recent items
             xml_lines.append('    <item>')
             
             # Title
-            title = row.get('Título', 'Sin título')
+            title = get_first_value(row, ['Título', 'Nombre'], 'Sin título')
             xml_lines.append(f'      <title>{escape_xml(title)}</title>')
             
             # Link
@@ -113,15 +147,17 @@ def create_rss_feed(csv_file, output_file='feed.xml', site_url='https://example.
             
             # Description
             description = row.get('Bajada', '')
-            if not description and row.get('Original'):
-                description = extract_text_from_html(row.get('Original', ''))
+            if not description:
+                original_or_content = get_first_value(row, ['Original', 'Contenido', 'Content'], '')
+                if original_or_content:
+                    description = extract_text_from_html(original_or_content)
                 description = truncate_text(description, 300)
             if not description:
                 description = row.get('Meta', 'Sin descripción')
             xml_lines.append(f'      <description>{escape_xml(description)}</description>')
             
             # Full content in content:encoded with CDATA
-            original_content = row.get('Original', '')
+            original_content = get_first_value(row, ['Original', 'Contenido', 'Content'], '')
             bajada = row.get('Bajada', '')
             
             # Combine bajada as subtitle with original content
