@@ -7,6 +7,7 @@ __pycache__/
 
 # CSV source (si no quieres exponerlo)
 Todo.csv
+Todo *.csv
 
 # macOS
 .DS_Store
